@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ room_name }} Reservation</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            background-color: #00263E;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            font-size: 50px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        .buttons button {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            font-size: 40px;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: white;
+            color: #00263E;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .timer {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            font-size: 50px;
+            margin: 20px 0;
+            color: #ce0000;
+        }
+        .logo {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>{{ room_name }}</h1>
+
+    <div class="timer" id="timer">
+        {% if reserved %}
+            Room is Reserved for {{ duration }} mins
+        {% else %}
+            Select a reservation time
+        {% endif %}
+    </div>
+
+    <div class="buttons">
+        <form method="POST" action="{{ url_for('reserve', room_name=room_name|lower) }}">
+            <button type="submit" name="duration" value="15">Reserve for 15 mins</button>
+            <button type="submit" name="duration" value="30">Reserve for 30 mins</button>
+            <button type="submit" name="duration" value="60">Reserve for 1 hr</button>
+            <button type="submit" name="duration" value="120">Reserve for 2 hrs</button>
+        </form>
+    </div>
+
+    <img src="{{ url_for('static', filename='samsara_vertical_logo_white.png') }}" alt="Samsara Logo" class="logo">
+</div>
+
+<script>
+    // Convert the duration from minutes to seconds for countdown purposes
+    let countdownDuration = Number("{{ duration | default(0) }}") * 60;
+
+    let timerElement = document.getElementById('timer');
+
+    if (countdownDuration > 0) {
+        let countdownInterval = setInterval(function() {
+            countdownDuration--;
+            let minutes = Math.floor(countdownDuration / 60);
+            let seconds = countdownDuration % 60;
+            timerElement.textContent = `Reserved for ${minutes}:${seconds < 10 ? '0' : ''}${seconds} mins`;
+
+            if (countdownDuration <= 0) {
+                clearInterval(countdownInterval);
+                timerElement.textContent = "Reservation time expired";
+            }
+        }, 1000);
+    }
+</script>
+
+
